@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#151918">
+  <meta name="description" content="Un pit wall personal para seguir y escribir a tus equipos de Fórmula 1 favoritos.">
+  <title>Pitwall | Formula One</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171b19;
+      --paper: #f2f3ef;
+      --white: #fff;
+      --muted: #717975;
+      --line: #dce0da;
+      --accent: #df352d;
+      --team: #e10600;
+      --heading: "Arial Narrow", "Franklin Gothic Medium", Impact, sans-serif;
+      --body: "Segoe UI", Tahoma, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); }
+    button, input, textarea { font: inherit; }
+    button { color: inherit; }
+    .topbar { height: 66px; padding: 0 clamp(20px, 5vw, 76px); display: flex; align-items: center; justify-content: space-between; background: var(--ink); color: white; }
+    .wordmark { display: flex; align-items: center; gap: 11px; font: 800 17px var(--heading); letter-spacing: 0; text-transform: uppercase; }
+    .mark { width: 27px; height: 27px; display: grid; place-items: center; border: 2px solid #f04438; color: #f04438; font: 900 11px var(--heading); transform: skew(-10deg); }
+    .top-meta { display: flex; align-items: center; gap: 18px; color: #c4cac5; font-size: 12px; }
+    .network { display: inline-flex; align-items: center; gap: 7px; }
+    .network::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #67c58a; }
+    .network.offline::before { background: #efaa42; }
+    .install-btn { display: none; padding: 9px 13px; border: 1px solid #59615c; border-radius: 3px; background: transparent; color: white; cursor: pointer; font-size: 12px; }
+    .install-btn.visible { display: inline-flex; }
+    main { max-width: 1240px; margin: 0 auto; padding: 30px clamp(18px, 5vw, 64px) 58px; }
+    .eyebrow { margin: 0; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1.7px; text-transform: uppercase; }
+    .page-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 23px; }
+    h1 { margin: 5px 0 0; font: 900 clamp(31px, 5vw, 48px)/.98 var(--heading); letter-spacing: 0; text-transform: uppercase; }
+    .season { color: var(--muted); font: 700 12px var(--heading); letter-spacing: 1px; }
+    .team-switcher { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 11px; margin-bottom: 17px; }
+    .arrow { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; background: transparent; cursor: pointer; font-size: 21px; transition: background .16s, color .16s; }
+    .arrow:hover { background: var(--ink); color: white; }
+    .team-tabs { display: flex; justify-content: center; gap: 7px; overflow-x: auto; scrollbar-width: none; }
+    .team-tabs::-webkit-scrollbar { display: none; }
+    .team-tab { flex: 0 0 auto; padding: 9px 13px; border: 1px solid transparent; border-radius: 2px; background: transparent; color: #656e68; cursor: pointer; font: 700 12px var(--heading); text-transform: uppercase; transition: color .18s, background .18s, border-color .18s; }
+    .team-tab[aria-current="true"] { border-color: var(--team); background: var(--team); color: white; }
+    .team-tab:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid #e0a932; outline-offset: 3px; }
+    .team-panel { --team: #e10600; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); min-height: 405px; background: var(--white); border-top: 4px solid var(--team); box-shadow: 0 8px 28px #17211b0c; animation: enter .35s ease both; }
+    @keyframes enter { from { opacity: .55; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .team-art { position: relative; min-height: 405px; overflow: hidden; display: flex; align-items: end; padding: 30px; background-color: #202624; background-image: linear-gradient(120deg, #101413 0%, #232b27 56%, var(--team) 56.2%, var(--team) 58%, #202624 58.2%); color: white; }
+    .team-art::before { content: ""; position: absolute; inset: 0; opacity: .22; background: repeating-linear-gradient(135deg, transparent 0 17px, #d9ded8 18px 19px, transparent 20px 38px); mask-image: linear-gradient(90deg, black, transparent 75%); pointer-events: none; }
+    .team-art.has-image { background-position: center; background-size: cover; background-repeat: no-repeat; }
+    .team-art.has-image::after { content: ""; position: absolute; inset: 35% 0 0; background: linear-gradient(transparent, #111a); }
+    .art-code { position: absolute; top: 24px; left: 28px; color: #ffffff23; font: 900 clamp(88px, 15vw, 174px)/.8 var(--heading); letter-spacing: 0; user-select: none; }
+    .art-caption { position: relative; z-index: 1; }
+    .art-caption span { display: block; margin-bottom: 6px; color: #d3dbd5; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+    .art-caption strong { display: block; font: 900 clamp(38px, 6vw, 66px)/.9 var(--heading); text-transform: uppercase; }
+    .image-actions { position: absolute; z-index: 2; top: 17px; right: 17px; display: flex; gap: 7px; }
+    .image-btn { padding: 9px 11px; border: 1px solid #ffffff8c; border-radius: 2px; background: #141917c7; color: white; cursor: pointer; font-size: 11px; font-weight: 700; }
+    .image-btn:hover { background: var(--team); border-color: var(--team); }
+    .image-btn[hidden] { display: none; }
+    #team-image-input { display: none; }
+    .team-details { display: flex; flex-direction: column; padding: clamp(23px, 4vw, 39px); }
+    .team-number { color: var(--team); font: 800 11px var(--heading); letter-spacing: 1.6px; text-transform: uppercase; }
+    .team-details h2 { margin: 13px 0 8px; font: 900 clamp(28px, 3vw, 40px)/.98 var(--heading); letter-spacing: 0; text-transform: uppercase; }
+    .team-alias { margin: 0; color: var(--muted); font-size: 12px; }
+    .team-description { margin: 22px 0 20px; color: #414a44; font-size: 14px; line-height: 1.65; }
+    .team-rule { height: 1px; margin-top: auto; background: var(--line); }
+    .palette-row { display: flex; align-items: center; gap: 9px; padding-top: 17px; color: var(--muted); font-size: 10px; }
+    .swatch { width: 17px; height: 17px; border: 1px solid #0002; border-radius: 50%; }
+    .team-count { margin-left: auto; color: var(--ink); font-weight: 700; }
+    .lower-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr); gap: 26px; margin-top: 28px; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+    .section-heading h3 { margin: 0; font: 900 19px var(--heading); text-transform: uppercase; }
+    .message-count { color: var(--muted); font-size: 11px; }
+    .composer { padding: 18px 0 20px; border-bottom: 1px solid var(--line); }
+    .composer-label { display: block; margin-bottom: 9px; font-size: 12px; font-weight: 700; }
+    textarea { display: block; width: 100%; min-height: 91px; resize: vertical; padding: 12px; border: 1px solid var(--line); border-radius: 2px; background: white; color: var(--ink); font-size: 13px; line-height: 1.5; }
+    .composer-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 11px; }
+    .form-note { max-width: 270px; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .send-btn { padding: 11px 17px; border: 0; border-radius: 2px; background: var(--team); color: white; cursor: pointer; font: 800 12px var(--heading); text-transform: uppercase; transition: filter .15s, transform .15s; }
+    .send-btn:hover { filter: brightness(.91); transform: translateY(-1px); }
+    .send-btn:disabled { opacity: .55; cursor: wait; }
+    .feed { display: grid; gap: 0; }
+    .feed-item { padding: 14px 0; border-bottom: 1px solid var(--line); animation: enter .25s ease both; }
+    .feed-meta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 10px; }
+    .feed-meta strong { color: var(--team); font: 800 12px var(--heading); text-transform: uppercase; }
+    .feed-item p { margin: 8px 0 0; color: #303833; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+    .empty-feed { padding: 24px 0; color: var(--muted); font-size: 12px; }
+    .status-pill { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; color: #8a6c31; font-size: 10px; }
+    .status-pill.sent { color: #317a4a; }
+    .status-pill.sending { color: #536c80; }
+    .status-icon { display: inline-block; font-size: 15px; font-weight: 800; line-height: 1; }
+    .tools { display: flex; gap: 8px; margin-top: 16px; }
+    .tool-btn { padding: 9px 11px; border: 1px solid var(--line); border-radius: 2px; background: transparent; cursor: pointer; font-size: 11px; font-weight: 700; }
+    .tool-btn:hover { border-color: var(--ink); }
+    .tool-btn[aria-pressed="true"] { border-color: #317a4a; color: #317a4a; }
+    .notice { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: min(360px, calc(100vw - 40px)); padding: 13px 16px; background: var(--ink); color: white; box-shadow: 0 8px 28px #1114; font-size: 12px; line-height: 1.5; opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s; }
+    .notice.show { opacity: 1; transform: translateY(0); }
+    footer { padding: 0 clamp(20px, 5vw, 76px) 21px; color: #7b837d; text-align: center; font-size: 10px; }
+    @media (max-width: 760px) {
+      .topbar { height: 58px; }
+      .top-meta { gap: 10px; }
+      .season { display: none; }
+      main { padding-top: 24px; }
+      .team-tabs { justify-content: flex-start; }
+      .team-panel { grid-template-columns: 1fr; }
+      .team-art { min-height: 300px; }
+      .team-details { min-height: 295px; }
+      .lower-grid { grid-template-columns: 1fr; gap: 27px; }
+    }
+    @media (max-width: 430px) {
+      .wordmark { font-size: 14px; }
+      .network { font-size: 0; }
+      .network::before { width: 9px; height: 9px; }
+      .install-btn { padding: 8px; font-size: 10px; }
+      .team-switcher { grid-template-columns: 36px minmax(0, 1fr) 36px; gap: 5px; }
+      .arrow { width: 34px; height: 34px; }
+      .team-tab { padding: 8px 10px; font-size: 11px; }
+      .team-art { min-height: 260px; padding: 23px; }
+      .image-btn { padding: 8px; font-size: 10px; }
+      .page-heading { margin-bottom: 18px; }
+      .composer-footer { align-items: end; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wordmark"><span class="mark" aria-hidden="true">PW</span> Pitwall <span style="color:#f04438">/</span> F1</div>
+    <div class="top-meta">
+      <span class="network" id="network-status" role="status">Con conexión</span>
+      <button class="install-btn" id="install-btn" type="button">Instalar app</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-heading">
+      <div><p class="eyebrow">Tu radio directa al paddock</p><h1>Elige tu equipo</h1></div>
+      <span class="season">PIT WALL · 2026</span>
+    </div>
+
+    <nav class="team-switcher" aria-label="Equipos de Fórmula 1">
+      <button class="arrow" id="previous-team" type="button" aria-label="Equipo anterior">‹</button>
+      <div class="team-tabs" id="team-tabs" role="tablist" aria-label="Seleccionar equipo"></div>
+      <button class="arrow" id="next-team" type="button" aria-label="Equipo siguiente">›</button>
+    </nav>
+
+    <section class="team-panel" id="team-panel" aria-live="polite">
+      <div class="team-art" id="team-art">
+        <span class="art-code" id="art-code" aria-hidden="true"></span>
+        <div class="image-actions">
+          <button class="image-btn" id="choose-image" type="button">＋ Añadir imagen</button>
+          <button class="image-btn" id="remove-image" type="button" hidden>Quitar imagen</button>
+          <input id="team-image-input" type="file" accept="image/*" aria-label="Elegir imagen del equipo">
+        </div>
+        <div class="art-caption"><span id="art-kicker">Escudería</span><strong id="art-name"></strong></div>
+      </div>
+      <div class="team-details">
+        <span class="team-number" id="team-number"></span>
+        <h2 id="team-name"></h2>
+        <p class="team-alias" id="team-alias"></p>
+        <p class="team-description" id="team-description"></p>
+        <div class="team-rule"></div>
+        <div class="palette-row"><span>Colores del equipo</span><span id="team-palette"></span><span class="team-count" id="team-count"></span></div>
+      </div>
+    </section>
+
+    <div class="lower-grid">
+      <section aria-labelledby="compose-heading">
+        <div class="section-heading"><h3 id="compose-heading">Enviar un mensaje</h3><span class="message-count" id="queue-count">0 en cola</span></div>
+        <form class="composer" id="message-form">
+          <label class="composer-label" for="message-input">Para <span id="recipient-name">el equipo</span></label>
+          <textarea id="message-input" maxlength="500" placeholder="Escribe tu mensaje para el equipo..." required></textarea>
+          <div class="composer-footer">
+            <span class="form-note">Los mensajes se guardan en este dispositivo; al volver la conexión, la sincronización local los marca como enviados. No se transmiten a un servidor.</span>
+            <button class="send-btn" id="send-btn" type="submit">Enviar mensaje ↗</button>
+          </div>
+        </form>
+        <div class="section-heading"><h3>Mensajes</h3><span class="message-count" id="message-count">0</span></div>
+        <div class="feed" id="message-feed" aria-live="polite"></div>
+      </section>
+
+      <section aria-labelledby="tools-heading">
+        <div class="section-heading"><h3 id="tools-heading">En tu pit wall</h3></div>
+        <div class="tools">
+          <button class="tool-btn" id="notification-btn" type="button" aria-pressed="false">Activar notificaciones</button>
+          <button class="tool-btn" id="sync-btn" type="button">Sincronizar ahora</button>
+        </div>
+        <p class="form-note" style="margin-top:12px">Los avisos locales funcionan en este dispositivo. Para recibir notificaciones push remotas hace falta un servidor de suscripciones.</p>
+      </section>
+    </div>
+  </main>
+  <footer>PITWALL / Los mensajes y las imágenes se guardan localmente en tu dispositivo.</footer>
+  <div class="notice" id="notice" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>

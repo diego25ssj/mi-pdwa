@@ -1,0 +1,58 @@
+[
+  {
+    "id": "ferrari",
+    "name": "Ferrari",
+    "alias": "Scuderia Ferrari HP",
+    "short": "FER",
+    "colors": ["#e10600", "#fff200", "#171717"],
+    "description": "La emblemática escudería italiana y una de las más exitosas de la historia de la categoría."
+  },
+  {
+    "id": "mclaren",
+    "name": "McLaren",
+    "alias": "McLaren Formula 1 Team",
+    "short": "MCL",
+    "colors": ["#ff8000", "#47c7fc", "#171717"],
+    "description": "Histórico equipo británico de gran palmarés y liderazgo reciente."
+  },
+  {
+    "id": "red-bull",
+    "name": "Red Bull Racing",
+    "alias": "Oracle Red Bull Racing",
+    "short": "RBR",
+    "colors": ["#1434cb", "#e10600", "#f4c542"],
+    "description": "El equipo de la marca de bebidas energéticas que ha dominado múltiples campeonatos."
+  },
+  {
+    "id": "mercedes",
+    "name": "Mercedes",
+    "alias": "Mercedes-AMG Petronas Formula One Team",
+    "short": "AMG",
+    "colors": ["#00a19b", "#c8ccca", "#111817"],
+    "description": "Gigante automotriz alemán, referente tanto como constructor como proveedor de motores."
+  },
+  {
+    "id": "racing-bulls",
+    "name": "Racing Bulls",
+    "alias": "Visa Cash App Racing Bulls",
+    "short": "VCARB",
+    "colors": ["#6699ff", "#ffffff", "#182b53"],
+    "description": "El equipo hermano y de desarrollo asociado a Red Bull."
+  },
+  {
+    "id": "audi",
+    "name": "Audi",
+    "alias": "Audi Revolut F1 Team",
+    "short": "AUD",
+    "colors": ["#d71920", "#f0f1ef", "#1a1c1b"],
+    "description": "Marca alemana integrada de lleno en la competición."
+  },
+  {
+    "id": "cadillac",
+    "name": "Cadillac",
+    "alias": "Cadillac Formula 1 Team",
+    "short": "CAD",
+    "colors": ["#c6a86b", "#f5f4ef", "#171b20"],
+    "description": "Una nueva marca que se incorpora a la parrilla de Fórmula 1."
+  }
+]
